@@ -6,6 +6,8 @@ import userRouter from "./src/routes/user.routes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import messageRouter from "./src/routes/message.routes.js";
+import http from "http";
+import socketServer from "./socket/socket.js";
 
 dotenv.config();
 const app = express();
@@ -31,7 +33,15 @@ app.get("/health",(req,res)=>{
     res.status(200).send("Server is healthy");
 })
 
-app.listen(PORT, () => {
+
+
+const server = http.createServer(app);
+
+
+socketServer(server);
+
+
+server.listen(PORT, () => {
     connectDb();
   console.log(`Server is running on port ${PORT}`);
 });
