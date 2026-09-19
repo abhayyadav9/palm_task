@@ -8,7 +8,7 @@ import axios from "axios";
 import socket from "../../services/socket";
 
 
-const Home = ({ user }) => {
+const Home  = ({ user }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showChat, setShowChat] = useState(false);
 
@@ -277,4 +277,4 @@ const Home = ({ user }) => {
   );
 };
 
-export default Home;
+export default Home;
