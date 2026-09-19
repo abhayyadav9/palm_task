@@ -7,6 +7,8 @@ const login = async (req, res) => {
 
   try {
     const { email, password } = req.body;
+    //wating time like 5 seconds to check loading state in frontend
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     console.log("email,password", email, password);
 
@@ -49,7 +51,8 @@ const login = async (req, res) => {
     // save token in cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
+      secure: false,
+      sameSite: "lax",
       maxAge: 3600000,
     });
 

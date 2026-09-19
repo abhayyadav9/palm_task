@@ -4,17 +4,26 @@ import connectDb from "./src/config/db.js";
 import dotenv from "dotenv";
 import userRouter from "./src/routes/user.routes.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import messageRouter from "./src/routes/message.routes.js";
 
+dotenv.config();
 const app = express();
 app.use(bodyParser.json());
 
 app.use(cookieParser());
 
-dotenv.config();
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 
 
 //all the routers\
 app.use("/api/user",userRouter)
+app.use("/api/message", messageRouter);
 
 const PORT = 5000;
 
