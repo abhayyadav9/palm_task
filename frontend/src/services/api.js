@@ -21,7 +21,10 @@ export const getUsersApi = ({ page = 1, limit = 10, query = "" } = {}) => {
 
 
 
+export const updateUserApi = `${API_BASE_URL}/api/user/me`;
+export const meApi = `${API_BASE_URL}/api/user/me`;
+
 //for the messages api
 
 export const sendMessageApi = `${API_BASE_URL}/api/message/send`;
-export const getMessagesApi = `${API_BASE_URL}/api/message/get`;
+export const getMessagesApi = `${API_BASE_URL}/api/message/get`;

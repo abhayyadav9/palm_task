@@ -11,37 +11,33 @@ import socketServer from "./socket/socket.js";
 
 dotenv.config();
 const app = express();
-app.use(bodyParser.json());
 
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
     credentials: true,
-  }),
+  })
 );
 
-
-//all the routers\
-app.use("/api/user",userRouter)
+// All routers
+app.use("/api/user", userRouter);
 app.use("/api/message", messageRouter);
 
-const PORT = 5000;
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: true, message: "Server is healthy" });
+});
 
-app.get("/health",(req,res)=>{
-    res.status(200).send("Server is healthy");
-})
-
-
-
+const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
-
 
 socketServer(server);
 
-
 server.listen(PORT, () => {
-    connectDb();
+  connectDb();
   console.log(`Server is running on port ${PORT}`);
 });
+

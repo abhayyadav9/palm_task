@@ -1,28 +1,34 @@
+import Message from "../../models/message.model.js";
 
-import Messagee from "../../models/message.model.js";
-const sendMessage = async (req,res)=>{
-    try{
-        const { senderId, receiverId, content } = req.body;
-        console.log("Received message:", { senderId, receiverId, content });
-        // Validate input
-        if (!senderId || !receiverId || !content) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-        // Create a new message
-        const newMessage = new Messagee({
-            sender: senderId,
-            receiver: receiverId,
-            content: content
+const sendMessage = async (req, res) => {
+  try {
+    const { receiverId, content } = req.body;
 
-        })
-        await newMessage.save();
-        res.status(201).json({ message: 'Message sent successfully', data: newMessage });
-
-
-    }catch(err){
-        console.error('Error sending message:', err);
-        res.status(500).json({ error: 'Failed to send message' });
+    if (!receiverId || !content?.trim()) {
+      return res.status(400).json({
+        status: false,
+        error: "Receiver ID and content are required",
+      });
     }
-}
 
-export default sendMessage;
+    const newMessage = await Message.create({
+      sender: req.user.id,
+      receiver: receiverId,
+      content: content.trim(),
+    });
+
+    return res.status(201).json({
+      status: true,
+      message: "Message sent successfully",
+      data: newMessage,
+    });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    return res.status(500).json({
+      status: false,
+      error: "Failed to send message",
+    });
+  }
+};
+
+export default sendMessage;

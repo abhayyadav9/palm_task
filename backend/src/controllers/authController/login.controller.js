@@ -3,73 +3,68 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const login = async (req, res) => {
-  console.log("login controller called");
-
   try {
-    const { email, password } = req.body;
-    //wating time like 5 seconds to check loading state in frontend
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    console.log("email,password", email, password);
+    const email = req.body.email?.trim().toLowerCase();
+    const { password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
-        message: "all field are required",
+        message: "All fields are required",
         status: false,
       });
     }
 
-    const eistingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email });
 
-    if (!eistingUser) {
+    if (!existingUser) {
       return res.status(400).json({
-        message: "user not found",
+        message: "User not found",
         status: false,
       });
     }
 
     const isPasswordValid = await bcrypt.compare(
       password,
-      eistingUser.password
+      existingUser.password
     );
 
     if (!isPasswordValid) {
       return res.status(400).json({
-        message: "invalid password",
+        message: "Invalid password",
         status: false,
       });
     }
 
     const token = jwt.sign(
-      { id: eistingUser._id },process.env.JWT_SECRET,
-      { expiresIn: "7h" }
+      { id: existingUser._id },
+      process.env.JWT_SECRET || "palm_task_secret_key",
+      { expiresIn: "7d" }
     );
 
-    // remove password before sending response
-    eistingUser.password = undefined;
+    const user = existingUser.toObject();
+    delete user.password;
 
-    // save token in cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 3600000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({
-      message: "login successful",
+      message: "Login successful",
       status: true,
       token: token,
-      data: eistingUser,
+      data: user,
     });
   } catch (err) {
-    console.log(err);
+    console.error("Login error:", err);
 
     return res.status(500).json({
-      message: "internal server error",
+      message: "Internal server error",
       status: false,
     });
   }
 };
 
-export default login;
+export default login;
